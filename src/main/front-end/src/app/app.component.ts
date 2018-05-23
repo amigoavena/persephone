@@ -11,9 +11,11 @@ import $ from 'jquery';
 export class AppComponent {
 	private serverUrl = 'http://localhost:8080/socket'
 	private title = 'WebSockets chat';
+	messageInput:string="";
 	private stompClient;
 	connected: boolean = false;
-	private username: string ="avena";
+	private username: string = "avena";
+	private messages: any = [];
 
 	colors = [
 		'#2196F3', '#32c787', '#00BCD4', '#ff5652',
@@ -40,19 +42,19 @@ export class AppComponent {
 		this.stompClient = Stomp.over(ws);
 		let that = this;
 		this.stompClient.connect({}, function(frame) {
-			that.stompClient.subscribe('/topic/public', this.onMessageReceived);
-
-		// Tell your username to the server
-			that.stompClient.send("/app/chat.addUser",
-				{},
-				JSON.stringify({ sender: this.username, type: 'JOIN' })
-			)
-			that.stompClient.subscribe("/chat", (message) => {
+			//that.stompClient.subscribe('/topic/public', this.onMessageReceived);
+			// Tell your username to the server
+			that.stompClient.subscribe("/topic/public", (message) => {
 				if (message.body) {
 					$(".chat").append("<div class='message'>" + message.body + "</div>")
 					console.log(message.body);
 				}
 			});
+			that.stompClient.send("/app/chat.addUser",
+				{},
+				JSON.stringify({ sender: this.username, type: 'JOIN' })
+			)
+
 		});
 	}
 
@@ -63,6 +65,8 @@ export class AppComponent {
 
 	onMessageReceived(payload) {
 		var message = JSON.parse(payload.body);
+
+		console.log(message);
 
 		var messageElement = document.createElement('li');
 
@@ -94,6 +98,8 @@ export class AppComponent {
 
 		messageElement.appendChild(textElement);
 
+		this.messages.push(message);
+
 		//messageArea.appendChild(messageElement);
 		//messageArea.scrollTop = messageArea.scrollHeight;
 	}
@@ -108,23 +114,27 @@ export class AppComponent {
 	}
 
 	onConnected() {
-		this.connected = true;
-		
-		// Subscribe to the Public Topic
-		this.stompClient.subscribe('/topic/public', this.onMessageReceived);
+		let self = this;
 
+		self.connected = true;
+
+		// Subscribe to the Public Topic
+		self.stompClient.subscribe('/topic/public', (message) => {
+			self.onMessageReceived(message);
+		});
+		console.log("uhm");
 		// Tell your username to the server
-		this.stompClient.send("/app/chat.addUser",
+		self.stompClient.send("/app/chat.addUser",
 			{},
-			JSON.stringify({ sender: this.username, type: 'JOIN' })
+			JSON.stringify({ sender: self.username, type: 'JOIN' })
 		)
 
 		//this.connectingElement.classList.add('hidden');
 	}
 
-	sendMessage(message) {
-		this.stompClient.send("/app/send/message", {}, message);
-		$('#input').val('');
+	sendMessage() {
+		this.stompClient.send("/app/chat.sendMessage", {}, 
+			JSON.stringify({ sender: this.username, type: 'CHAT', content: this.messageInput }));
 	}
 
 }

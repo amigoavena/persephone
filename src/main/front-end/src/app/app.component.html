@@ -18,12 +18,15 @@
 			Connecting...
 		</div>
 		<ul id="messageArea">
+    		<li *ngFor="let message of messages"> 
+    {{ message.sender }} : {{ message.content }}
+  </li>
 		</ul>
 		<form id="messageForm" name="messageForm">
 			<div class="form-group">
 				<div class="input-group clearfix">
-					<input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
-					<button type="submit" class="primary">Send</button>
+					<input type="text" name="messageInput" [(ngModel)]="messageInput" placeholder="Type a message..." autocomplete="off" class="form-control"/>
+					<button (click)="sendMessage($event)"  class="primary">Send</button>
 				</div>
 			</div>
 		</form>
