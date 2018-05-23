@@ -9,4 +9,5 @@ public class PersephoneApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PersephoneApplication.class, args);
 	}
+	
 }
