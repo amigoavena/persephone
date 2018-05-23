@@ -1,9 +1,31 @@
-<div class="container-fluid">
-  <div class="row d-flex">
-    <nav class="col-md-3" id="sidebar">
-      <h2>I'm a sidebar</h2>      
-    </nav>
-    <main class="col-md-9"><i class="oi oi-person" title="person" aria-hidden="true"></i>
-    </main>
-  </div>
+<div *ngIf="!username" id="username-page">
+	<div class="username-page-container">
+		<h1 class="title">Type your username</h1>
+			<div class="form-group">
+				<input type="text" id="username" placeholder="Username" autocomplete="off" [(ngModel)]="username" class="form-control" />
+			</div>
+			<div class="form-group">
+				<button (click)="connect($event)" class="accent username-submit">Start Chatting</button>
+			</div>
+	</div>
+</div>
+<div *ngIf="username" div id="chat-page">
+	<div class="chat-container">
+		<div class="chat-header">
+			<h2>Spring WebSocket Chat Demo {{username}}</h2>
+		</div>
+		<div *ngIf="!connected" class="connecting">
+			Connecting...
+		</div>
+		<ul id="messageArea">
+		</ul>
+		<form id="messageForm" name="messageForm">
+			<div class="form-group">
+				<div class="input-group clearfix">
+					<input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
+					<button type="submit" class="primary">Send</button>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
